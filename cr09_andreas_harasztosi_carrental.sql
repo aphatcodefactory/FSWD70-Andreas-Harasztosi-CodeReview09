@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Erstellungszeit: 06. Jul 2019 um 19:42
+-- Erstellungszeit: 07. Jul 2019 um 18:48
 -- Server-Version: 10.1.38-MariaDB
 -- PHP-Version: 7.1.27
 
@@ -21,7 +21,7 @@ SET time_zone = "+00:00";
 --
 -- Datenbank: `cr09_andreas_harasztosi_carrental`
 --
-CREATE DATABASE IF NOT EXISTS `cr09_andreas_harasztosi_carrental` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+CREATE DATABASE IF NOT EXISTS `cr09_andreas_harasztosi_carrental` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 USE `cr09_andreas_harasztosi_carrental`;
 
 -- --------------------------------------------------------
@@ -32,10 +32,20 @@ USE `cr09_andreas_harasztosi_carrental`;
 
 CREATE TABLE `base` (
   `baseID` int(11) NOT NULL,
-  `address` char(25) NOT NULL,
+  `address` char(35) NOT NULL,
   `fk_postCodeID` int(11) NOT NULL,
   `country` char(15) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Daten für Tabelle `base`
+--
+
+INSERT INTO `base` (`baseID`, `address`, `fk_postCodeID`, `country`) VALUES
+(1, 'Am Hasenanger 2', 4, 'Austria'),
+(2, 'Terminal 3', 5, 'Austria'),
+(3, 'Herklotzgasse 23', 2, 'Austria'),
+(4, 'Ziegelofengasse 24', 3, 'Austria');
 
 -- --------------------------------------------------------
 
@@ -47,13 +57,22 @@ CREATE TABLE `car` (
   `carID` int(11) NOT NULL,
   `manufacturer` char(15) NOT NULL,
   `model` char(15) NOT NULL,
-  `colour` char(10) NOT NULL,
+  `colour` char(20) NOT NULL,
   `doors` int(10) UNSIGNED NOT NULL,
   `hp` int(10) UNSIGNED NOT NULL,
   `fuelType` char(15) NOT NULL,
   `gearType` char(15) NOT NULL,
   `fk_baseID` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Daten für Tabelle `car`
+--
+
+INSERT INTO `car` (`carID`, `manufacturer`, `model`, `colour`, `doors`, `hp`, `fuelType`, `gearType`, `fk_baseID`) VALUES
+(1, 'Dodge', 'Ram', 'wine red', 5, 400, 'Super Plus', 'automatic', 2),
+(2, 'BMW', '730', 'blue metallic', 5, 275, 'Diesel', 'automatic', 1),
+(3, 'Hyundai', 'Atos', 'yellow', 5, 65, 'Benzin', 'manual', 4);
 
 -- --------------------------------------------------------
 
@@ -63,14 +82,22 @@ CREATE TABLE `car` (
 
 CREATE TABLE `customer` (
   `customerID` int(11) NOT NULL,
-  `fk_resID` int(11) NOT NULL,
+  `fk_resID` int(11) DEFAULT NULL,
   `firstName` char(20) NOT NULL,
   `lastName` char(25) NOT NULL,
   `birthdate` date NOT NULL,
-  `address` char(25) NOT NULL,
+  `address` char(35) NOT NULL,
   `fk_postCodeID` int(11) NOT NULL,
   `country` char(15) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Daten für Tabelle `customer`
+--
+
+INSERT INTO `customer` (`customerID`, `fk_resID`, `firstName`, `lastName`, `birthdate`, `address`, `fk_postCodeID`, `country`) VALUES
+(3, NULL, 'Valentina', 'Italiana', '1997-04-30', 'Am Hasenanger 2', 4, 'Austria'),
+(4, NULL, 'Peter W.', 'Schnitzel', '1982-09-16', 'Leopold-Weymarer-Str. 14/4/3', 3, 'Austria');
 
 -- --------------------------------------------------------
 
@@ -81,8 +108,19 @@ CREATE TABLE `customer` (
 CREATE TABLE `postcodecity` (
   `postCodeID` int(11) NOT NULL,
   `postCode` int(10) UNSIGNED NOT NULL,
-  `city` char(15) NOT NULL
+  `city` char(25) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Daten für Tabelle `postcodecity`
+--
+
+INSERT INTO `postcodecity` (`postCodeID`, `postCode`, `city`) VALUES
+(1, 1150, 'Wien'),
+(2, 1050, 'Wien'),
+(3, 3400, 'Klosterneuburg'),
+(4, 5350, 'Strobl a. Wolfgangsee'),
+(5, 1300, 'Flughafen Wien');
 
 -- --------------------------------------------------------
 
@@ -100,6 +138,14 @@ CREATE TABLE `reservation` (
   `fk_postCodeID` int(11) NOT NULL,
   `whenRes` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Daten für Tabelle `reservation`
+--
+
+INSERT INTO `reservation` (`resID`, `fk_customerID`, `forWhichDatetime`, `untilWhen`, `fk_carID`, `fk_baseID`, `fk_postCodeID`, `whenRes`) VALUES
+(1, 1, '2019-07-08 16:15:00', '2019-07-07 20:00:00', 1, 3, 1, '2019-07-07 16:48:01'),
+(2, 2, '2019-07-12 14:30:00', '2019-07-19 18:00:00', 1, 2, 5, '2019-07-07 16:48:01');
 
 --
 -- Indizes der exportierten Tabellen
@@ -150,31 +196,31 @@ ALTER TABLE `reservation`
 -- AUTO_INCREMENT für Tabelle `base`
 --
 ALTER TABLE `base`
-  MODIFY `baseID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `baseID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT für Tabelle `car`
 --
 ALTER TABLE `car`
-  MODIFY `carID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `carID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT für Tabelle `customer`
 --
 ALTER TABLE `customer`
-  MODIFY `customerID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `customerID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT für Tabelle `postcodecity`
 --
 ALTER TABLE `postcodecity`
-  MODIFY `postCodeID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `postCodeID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT für Tabelle `reservation`
 --
 ALTER TABLE `reservation`
-  MODIFY `resID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `resID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints der exportierten Tabellen

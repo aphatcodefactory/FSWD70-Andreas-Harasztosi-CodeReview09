@@ -3,12 +3,12 @@ CREATE DATABASE cr09_andreas_harasztosi_carrental;
 CREATE TABLE postCodeCity(
 	postCodeID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	postCode INT UNSIGNED NOT NULL,
-	city CHAR(15) NOT NULL
+	city CHAR(25) NOT NULL
 );
 
 CREATE TABLE base(
 	baseID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    address CHAR(25) NOT NULL,
+    address CHAR(35) NOT NULL,
     fk_postCodeID INT NOT NULL,
     country CHAR(15),
     FOREIGN KEY (fk_postCodeID) REFERENCES postCodeCity(postCodeID) ON DELETE RESTRICT ON UPDATE CASCADE
@@ -18,7 +18,7 @@ CREATE TABLE car(
 	carID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     manufacturer CHAR(15) NOT NULL,
     model CHAR(15) NOT NULL,
-    colour CHAR(10) NOT NULL,
+    colour CHAR(20) NOT NULL,
     doors INT UNSIGNED NOT NULL,
     hp INT UNSIGNED NOT NULL,
     fuelType CHAR(15) NOT NULL,
@@ -43,11 +43,11 @@ CREATE TABLE reservation(
 
 CREATE TABLE customer(
 	customerID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    fk_resID INT NOT NULL,
+    fk_resID INT,
     firstName CHAR(20) NOT NULL,
     lastName CHAR(25) NOT NULL,
     birthdate DATE NOT NULL,
-    address CHAR(25) NOT NULL,
+    address CHAR(35) NOT NULL,
     fk_postCodeID INT NOT NULL,
     country CHAR(15),
     FOREIGN KEY (fk_resID) REFERENCES reservation(resID) ON DELETE RESTRICT ON UPDATE CASCADE,
