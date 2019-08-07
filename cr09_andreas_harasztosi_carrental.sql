@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.8.5
+-- version 4.9.0.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Erstellungszeit: 07. Jul 2019 um 18:48
--- Server-Version: 10.1.38-MariaDB
--- PHP-Version: 7.1.27
+-- Erstellungszeit: 07. Aug 2019 um 13:51
+-- Server-Version: 10.3.16-MariaDB
+-- PHP-Version: 7.3.6
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -21,8 +21,22 @@ SET time_zone = "+00:00";
 --
 -- Datenbank: `cr09_andreas_harasztosi_carrental`
 --
-CREATE DATABASE IF NOT EXISTS `cr09_andreas_harasztosi_carrental` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE DATABASE IF NOT EXISTS `cr09_andreas_harasztosi_carrental` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
 USE `cr09_andreas_harasztosi_carrental`;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `address`
+--
+
+CREATE TABLE `address` (
+  `addressID` int(11) NOT NULL,
+  `street_no` varchar(40) NOT NULL,
+  `postCode` int(10) UNSIGNED NOT NULL,
+  `city` char(25) NOT NULL,
+  `country` char(25) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -32,20 +46,8 @@ USE `cr09_andreas_harasztosi_carrental`;
 
 CREATE TABLE `base` (
   `baseID` int(11) NOT NULL,
-  `address` char(35) NOT NULL,
-  `fk_postCodeID` int(11) NOT NULL,
-  `country` char(15) DEFAULT NULL
+  `fk_addressID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Daten für Tabelle `base`
---
-
-INSERT INTO `base` (`baseID`, `address`, `fk_postCodeID`, `country`) VALUES
-(1, 'Am Hasenanger 2', 4, 'Austria'),
-(2, 'Terminal 3', 5, 'Austria'),
-(3, 'Herklotzgasse 23', 2, 'Austria'),
-(4, 'Ziegelofengasse 24', 3, 'Austria');
 
 -- --------------------------------------------------------
 
@@ -65,15 +67,6 @@ CREATE TABLE `car` (
   `fk_baseID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Daten für Tabelle `car`
---
-
-INSERT INTO `car` (`carID`, `manufacturer`, `model`, `colour`, `doors`, `hp`, `fuelType`, `gearType`, `fk_baseID`) VALUES
-(1, 'Dodge', 'Ram', 'wine red', 5, 400, 'Super Plus', 'automatic', 2),
-(2, 'BMW', '730', 'blue metallic', 5, 275, 'Diesel', 'automatic', 1),
-(3, 'Hyundai', 'Atos', 'yellow', 5, 65, 'Benzin', 'manual', 4);
-
 -- --------------------------------------------------------
 
 --
@@ -86,41 +79,8 @@ CREATE TABLE `customer` (
   `firstName` char(20) NOT NULL,
   `lastName` char(25) NOT NULL,
   `birthdate` date NOT NULL,
-  `address` char(35) NOT NULL,
-  `fk_postCodeID` int(11) NOT NULL,
-  `country` char(15) DEFAULT NULL
+  `fk_addressID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Daten für Tabelle `customer`
---
-
-INSERT INTO `customer` (`customerID`, `fk_resID`, `firstName`, `lastName`, `birthdate`, `address`, `fk_postCodeID`, `country`) VALUES
-(3, NULL, 'Valentina', 'Italiana', '1997-04-30', 'Am Hasenanger 2', 4, 'Austria'),
-(4, NULL, 'Peter W.', 'Schnitzel', '1982-09-16', 'Leopold-Weymarer-Str. 14/4/3', 3, 'Austria');
-
--- --------------------------------------------------------
-
---
--- Tabellenstruktur für Tabelle `postcodecity`
---
-
-CREATE TABLE `postcodecity` (
-  `postCodeID` int(11) NOT NULL,
-  `postCode` int(10) UNSIGNED NOT NULL,
-  `city` char(25) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Daten für Tabelle `postcodecity`
---
-
-INSERT INTO `postcodecity` (`postCodeID`, `postCode`, `city`) VALUES
-(1, 1150, 'Wien'),
-(2, 1050, 'Wien'),
-(3, 3400, 'Klosterneuburg'),
-(4, 5350, 'Strobl a. Wolfgangsee'),
-(5, 1300, 'Flughafen Wien');
 
 -- --------------------------------------------------------
 
@@ -135,28 +95,26 @@ CREATE TABLE `reservation` (
   `untilWhen` datetime DEFAULT NULL,
   `fk_carID` int(11) NOT NULL,
   `fk_baseID` int(11) NOT NULL,
-  `fk_postCodeID` int(11) NOT NULL,
-  `whenRes` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `fk_addressID` int(11) NOT NULL,
+  `whenRes` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Daten für Tabelle `reservation`
---
-
-INSERT INTO `reservation` (`resID`, `fk_customerID`, `forWhichDatetime`, `untilWhen`, `fk_carID`, `fk_baseID`, `fk_postCodeID`, `whenRes`) VALUES
-(1, 1, '2019-07-08 16:15:00', '2019-07-07 20:00:00', 1, 3, 1, '2019-07-07 16:48:01'),
-(2, 2, '2019-07-12 14:30:00', '2019-07-19 18:00:00', 1, 2, 5, '2019-07-07 16:48:01');
 
 --
 -- Indizes der exportierten Tabellen
 --
 
 --
+-- Indizes für die Tabelle `address`
+--
+ALTER TABLE `address`
+  ADD PRIMARY KEY (`addressID`);
+
+--
 -- Indizes für die Tabelle `base`
 --
 ALTER TABLE `base`
   ADD PRIMARY KEY (`baseID`),
-  ADD KEY `fk_postCodeID` (`fk_postCodeID`);
+  ADD KEY `base_ibfk_1` (`fk_addressID`);
 
 --
 -- Indizes für die Tabelle `car`
@@ -170,57 +128,52 @@ ALTER TABLE `car`
 --
 ALTER TABLE `customer`
   ADD PRIMARY KEY (`customerID`),
-  ADD KEY `fk_resID` (`fk_resID`),
-  ADD KEY `fk_postCodeID` (`fk_postCodeID`);
-
---
--- Indizes für die Tabelle `postcodecity`
---
-ALTER TABLE `postcodecity`
-  ADD PRIMARY KEY (`postCodeID`);
+  ADD KEY `fk_addressID` (`fk_addressID`),
+  ADD KEY `fk_resID` (`fk_resID`);
 
 --
 -- Indizes für die Tabelle `reservation`
 --
 ALTER TABLE `reservation`
   ADD PRIMARY KEY (`resID`),
+  ADD KEY `reservation_ibfk_1` (`fk_addressID`),
   ADD KEY `fk_carID` (`fk_carID`),
-  ADD KEY `fk_baseID` (`fk_baseID`),
-  ADD KEY `fk_postCodeID` (`fk_postCodeID`);
+  ADD KEY `fk_customerID` (`fk_customerID`),
+  ADD KEY `fk_baseID` (`fk_baseID`);
 
 --
 -- AUTO_INCREMENT für exportierte Tabellen
 --
 
 --
+-- AUTO_INCREMENT für Tabelle `address`
+--
+ALTER TABLE `address`
+  MODIFY `addressID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT für Tabelle `base`
 --
 ALTER TABLE `base`
-  MODIFY `baseID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `baseID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT für Tabelle `car`
 --
 ALTER TABLE `car`
-  MODIFY `carID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `carID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT für Tabelle `customer`
 --
 ALTER TABLE `customer`
-  MODIFY `customerID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT für Tabelle `postcodecity`
---
-ALTER TABLE `postcodecity`
-  MODIFY `postCodeID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `customerID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT für Tabelle `reservation`
 --
 ALTER TABLE `reservation`
-  MODIFY `resID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `resID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints der exportierten Tabellen
@@ -230,7 +183,7 @@ ALTER TABLE `reservation`
 -- Constraints der Tabelle `base`
 --
 ALTER TABLE `base`
-  ADD CONSTRAINT `base_ibfk_1` FOREIGN KEY (`fk_postCodeID`) REFERENCES `postcodecity` (`postCodeID`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `base_ibfk_1` FOREIGN KEY (`fk_addressID`) REFERENCES `address` (`addressID`) ON UPDATE CASCADE;
 
 --
 -- Constraints der Tabelle `car`
@@ -242,16 +195,17 @@ ALTER TABLE `car`
 -- Constraints der Tabelle `customer`
 --
 ALTER TABLE `customer`
-  ADD CONSTRAINT `customer_ibfk_1` FOREIGN KEY (`fk_resID`) REFERENCES `reservation` (`resID`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `customer_ibfk_2` FOREIGN KEY (`fk_postCodeID`) REFERENCES `postcodecity` (`postCodeID`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `customer_ibfk_1` FOREIGN KEY (`fk_addressID`) REFERENCES `address` (`addressID`),
+  ADD CONSTRAINT `customer_ibfk_2` FOREIGN KEY (`fk_resID`) REFERENCES `reservation` (`resID`) ON UPDATE CASCADE;
 
 --
 -- Constraints der Tabelle `reservation`
 --
 ALTER TABLE `reservation`
-  ADD CONSTRAINT `reservation_ibfk_1` FOREIGN KEY (`fk_carID`) REFERENCES `car` (`carID`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `reservation_ibfk_2` FOREIGN KEY (`fk_baseID`) REFERENCES `base` (`baseID`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `reservation_ibfk_3` FOREIGN KEY (`fk_postCodeID`) REFERENCES `postcodecity` (`postCodeID`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `reservation_ibfk_1` FOREIGN KEY (`fk_addressID`) REFERENCES `address` (`addressID`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `reservation_ibfk_3` FOREIGN KEY (`fk_carID`) REFERENCES `car` (`carID`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `reservation_ibfk_4` FOREIGN KEY (`fk_customerID`) REFERENCES `customer` (`customerID`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `reservation_ibfk_5` FOREIGN KEY (`fk_baseID`) REFERENCES `base` (`baseID`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
